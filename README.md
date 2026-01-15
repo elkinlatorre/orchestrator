@@ -1,65 +1,244 @@
 🤖 Agentic AI Orchestrator & Sandbox
-Java 25 | Spring Boot 4 | LangChain4j | Docker | Virtual Threads
-This project is a Technical Proof of Concept (PoC) for an Artificial Intelligence Agent Orchestrator capable of reasoning, generating specialized Python code, and executing it securely within isolated environments (Sandboxing).
 
-🚀 Key Features
-Multi-Model Orchestration: Employs a lightweight model (Llama 3.2) for intent routing and a specialized model (DeepSeek-Coder) for complex logic generation.
+Autonomous AI Code Execution Platform
 
-Secure Docker Sandboxing: Executes AI-generated code inside ephemeral containers with strict resource constraints (512MB RAM, 50% CPU quota) and disabled network access.
+Java 25 · Spring Boot 4 · LangChain4j · Docker · Virtual Threads
 
-Autonomous Self-Healing: If the generated code fails, the agent receives the execution traceback and automatically attempts to fix and re-run the script (up to 3 retries).
+This project is a Technical Proof of Concept (PoC) for an Agentic AI Orchestrator capable of:
 
-Real-time Audit Dashboard: A built-in monitoring interface to visualize the thought process, generated code snippets, and execution outputs.
+Understanding user intent
 
-🛠️ Tech Stack
-Backend: Java 25, Spring Boot 4 (Snapshot), JPA, H2 Database.
+Generating specialized Python code
 
-AI Framework: LangChain4j, Ollama (Llama 3.2 & DeepSeek-Coder).
+Executing it securely inside isolated sandboxes
 
-Infrastructure: Docker Engine API for Java.
+Detecting failures and self-healing automatically
 
-Frontend: HTML5, Tailwind CSS, Vanilla JavaScript.
+It represents a production-grade architecture for safely running LLM-generated code.
+
+🚀 Core Capabilities
+🧠 Multi-Model Orchestration
+
+Uses a two-tier AI architecture:
+
+Role	Model	Responsibility
+Router	Llama 3.2	Intent detection & task routing
+Coder	llama3.1:8b	Python code synthesis & reasoning
+
+This keeps simple requests fast while reserving heavy reasoning for complex tasks.
+
+🐳 Secure Docker Sandboxing
+
+All AI-generated code runs in ephemeral Docker containers with:
+
+512 MB RAM limit
+
+50% CPU quota
+
+Network disabled
+
+Auto-remove on exit
+
+This provides strong isolation against:
+
+Infinite loops
+
+Data leaks
+
+Malicious instructions
+
+🔄 Autonomous Self-Healing
+
+When execution fails:
+
+The container returns the traceback
+
+The agent receives the error
+
+A corrected version of the code is generated
+
+The code is re-executed
+
+Up to 3 automatic recovery attempts are performed without user intervention.
+
+📊 Real-Time Audit Dashboard
+
+A built-in web UI shows:
+
+The model’s reasoning steps
+
+Generated Python code
+
+Execution output
+
+Errors and retries
+
+This gives full transparency into how the agent is behaving.
+
+🛠️ Technology Stack
+Backend
+
+Java 25
+
+Spring Boot 4 (Snapshot)
+
+JPA
+
+H2 Database
+
+Virtual Threads
+
+AI & Orchestration
+
+LangChain4j
+
+Ollama
+
+Llama 3.2
+
+llama3.1:8b
+
+Infrastructure
+
+Docker Engine API for Java
+
+Frontend
+
+HTML5
+
+Tailwind CSS
+
+Vanilla JavaScript
 
 📐 System Architecture
-The request lifecycle follows a structured agentic workflow:
 
-Intent Classification: The RouterModel analyzes the prompt to determine if it requires data analysis, code generation, or a general response.
+The system follows a fully agentic execution pipeline:
 
-Code Generation: For analysis tasks, the CoderModel synthesizes a precise Python script.
+User Prompt
+↓
+Intent Classification (Router Model)
+↓
+Python Code Generation (Coder Model)
+↓
+LLM Output Sanitization
+↓
+Docker Sandbox Execution
+↓
+Success → Persist logs
+↓
+Failure → Self-Healing Loop → Retry
 
-Sanitization: A robust parsing utility cleans the LLM output, stripping away prose and Markdown artifacts.
+Execution Flow
 
-Sandbox Execution: The sanitized code is dispatched to an isolated Docker container.
+Intent Classification
+Determines whether the request requires computation, code execution, or plain text.
 
-Self-Healing Loop: If an exception occurs, the agent reflects on the error log and generates a corrected version of the code.
+Code Generation
+The Coder model generates a pure Python script for analysis tasks.
 
-Async Persistence: Execution logs are saved to the H2 database using Virtual Threads to ensure zero latency for the end user.
+Sanitization Layer
+Removes Markdown, prose, and artifacts from LLM output.
 
-🔧 Setup and Installation
+Sandbox Execution
+The script is executed inside a locked-down Docker container.
+
+Self-Healing
+If an error occurs, the traceback is fed back to the model for correction.
+
+Async Persistence
+All logs are stored in H2 using Virtual Threads to avoid blocking the UI.
+
+🔧 Setup & Installation
 Prerequisites
-Docker Engine running locally.
 
-Ollama installed with the following models: llama3.2:3b and llama3.1:8b.
+Docker Engine running locally
 
-JDK 25.
+Ollama installed with:
 
-Installation Steps
-Clone the repository.
+llama3.2:3b
 
-Update application.yml with your Ollama base URL and model names.
+llama3.1:8b
 
-Run the application using Maven:
+JDK 25
 
-Bash
+Installation
+
+Clone the repository
+
+Configure application.yml with:
+
+Ollama base URL
+
+Model names
+
+Run:
 
 mvn spring-boot:run
-Open the Dashboard: http://localhost:8080/index.html.
 
-🛡️ Security Implementations
-This orchestrator implements critical security layers to mitigate risks associated with LLM-generated code:
 
-Network Isolation: Containers are created with withNetworkDisabled(true) to prevent data exfiltration.
+Open the dashboard:
 
-Resource Quotas: Hard limits on CPU and RAM prevent Denial of Service (DoS) attacks caused by infinite loops.
+http://localhost:8080/index.html
 
-Ephemeral Lifecycle: Containers use AutoRemove and forced cleanup to ensure no residual data or processes remain post-execution.
+🛡️ Security Architecture
+
+This system is designed for safe execution of untrusted AI code.
+
+🔒 Network Isolation
+
+Docker containers are created with:
+
+withNetworkDisabled(true)
+
+
+This prevents:
+
+Data exfiltration
+
+External API calls
+
+Lateral movement
+
+⚙️ Resource Quotas
+
+Hard limits prevent DoS attacks:
+
+Resource	Limit
+RAM	512 MB
+CPU	50%
+Lifetime	Auto-removed
+🧹 Ephemeral Execution
+
+Containers are:
+
+Auto-removed
+
+Force-killed after execution
+
+Never reused
+
+No filesystem state or processes survive after execution.
+
+🎯 Why This Matters
+
+This project demonstrates a production-grade pattern for:
+
+Running LLM-generated code safely
+
+Enabling autonomous reasoning agents
+
+Preventing sandbox escapes
+
+Supporting self-correcting AI workflows
+
+It can be extended to:
+
+Data analysis
+
+AI copilots
+
+Autonomous ETL
+
+Secure AI tooling
+
+Agent-based automation
