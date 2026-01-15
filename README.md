@@ -1,244 +1,136 @@
-🤖 Agentic AI Orchestrator & Sandbox
+# 🤖 Agentic AI Orchestrator & Sandbox
 
-Autonomous AI Code Execution Platform
+![Java](https://img.shields.io/badge/Java-25-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0_(Snapshot)-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![LangChain4j](https://img.shields.io/badge/LangChain4j-0.33.0-blue?style=for-the-badge)
 
-Java 25 · Spring Boot 4 · LangChain4j · Docker · Virtual Threads
+> **Autonomous AI Code Execution Platform**
+> *Understand intent. Generate code. Execute securely. Self-heal.*
 
-This project is a Technical Proof of Concept (PoC) for an Agentic AI Orchestrator capable of:
+---
 
-Understanding user intent
+## 📖 Overview
 
-Generating specialized Python code
+This project is a **Technical Proof of Concept (PoC)** for an Agentic AI Orchestrator. It is designed to safely run LLM-generated code in a production-grade architecture.
 
-Executing it securely inside isolated sandboxes
+**Key Capabilities:**
+*   **Intent Understanding**: Distinguishes between conversational requests and actionable computing tasks.
+*   **Code Synthesis**: Generates specialized Python code for complex problems.
+*   **Secure Execution**: Runs untrusted code inside isolated, ephemeral Docker sandboxes.
+*   **Self-Healing**: Automatically detects execution failures, feeds errors back to the AI, and retries up to 3 times.
 
-Detecting failures and self-healing automatically
+---
 
-It represents a production-grade architecture for safely running LLM-generated code.
+## 🚀 Core Capabilities
 
-🚀 Core Capabilities
-🧠 Multi-Model Orchestration
+### 🧠 Multi-Model Orchestration
 
-Uses a two-tier AI architecture:
+The system employs a two-tier AI architecture to balance speed and intelligence:
 
-Role	Model	Responsibility
-Router	Llama 3.2	Intent detection & task routing
-Coder	llama3.1:8b	Python code synthesis & reasoning
+| Role | Model | Responsibility |
+| :--- | :--- | :--- |
+| **Router** | `Llama 3.2` | Fast intent detection & task routing. |
+| **Coder** | `llama3.1:8b` | Deep reasoning & Python code synthesis. |
 
-This keeps simple requests fast while reserving heavy reasoning for complex tasks.
+### 🐳 Secure Docker Sandboxing
 
-🐳 Secure Docker Sandboxing
+All AI-generated code runs in ephemeral Docker containers with strict resource limits to ensure safety:
 
-All AI-generated code runs in ephemeral Docker containers with:
+*   **Memory**: 512 MB hard limit
+*   **CPU**: 50% quota
+*   **Network**: DISABLED (No external access)
+*   **Lifecycle**: Auto-removed immediately after execution
 
-512 MB RAM limit
+### 🔄 Autonomous Self-Healing
 
-50% CPU quota
+The agent doesn't just fail; it learns.
+1.  **Execute**: Container runs the code.
+2.  **Catch**: System captures traceback on failure.
+3.  **Reflect**: Error is sent back to the `Coder` model.
+4.  **Retry**: Corrected code is generated and re-run.
 
-Network disabled
+---
 
-Auto-remove on exit
+## 🛠️ Technology Stack
 
-This provides strong isolation against:
+| Category | Technologies |
+| :--- | :--- |
+| **Backend** | Java 25, Spring Boot 4 (Snapshot), JPA, H2 Database, Virtual Threads |
+| **AI** | LangChain4j, Ollama (Llama 3.2, llama3.1:8b) |
+| **Infrastructure** | Docker Engine API for Java |
+| **Frontend** | HTML5, Tailwind CSS, Vanilla JavaScript |
 
-Infinite loops
+---
 
-Data leaks
-
-Malicious instructions
-
-🔄 Autonomous Self-Healing
-
-When execution fails:
-
-The container returns the traceback
-
-The agent receives the error
-
-A corrected version of the code is generated
-
-The code is re-executed
-
-Up to 3 automatic recovery attempts are performed without user intervention.
-
-📊 Real-Time Audit Dashboard
-
-A built-in web UI shows:
-
-The model’s reasoning steps
-
-Generated Python code
-
-Execution output
-
-Errors and retries
-
-This gives full transparency into how the agent is behaving.
-
-🛠️ Technology Stack
-Backend
-
-Java 25
-
-Spring Boot 4 (Snapshot)
-
-JPA
-
-H2 Database
-
-Virtual Threads
-
-AI & Orchestration
-
-LangChain4j
-
-Ollama
-
-Llama 3.2
-
-llama3.1:8b
-
-Infrastructure
-
-Docker Engine API for Java
-
-Frontend
-
-HTML5
-
-Tailwind CSS
-
-Vanilla JavaScript
-
-📐 System Architecture
+## 📐 System Architecture
 
 The system follows a fully agentic execution pipeline:
 
-User Prompt
-↓
-Intent Classification (Router Model)
-↓
-Python Code Generation (Coder Model)
-↓
-LLM Output Sanitization
-↓
-Docker Sandbox Execution
-↓
-Success → Persist logs
-↓
-Failure → Self-Healing Loop → Retry
+```mermaid
+graph TD
+    User([User Prompt]) --> Router{Intent Classifier}
+    Router -- "Chat" --> Chat[Simple Response]
+    Router -- "Compute" --> Coder[Coder Model]
+    
+    subgraph "Execution Loop"
+        Coder --> Sanitizer[Sanitization Layer]
+        Sanitizer --> Sandbox[Docker Sandbox]
+        Sandbox -- "Success" --> Result[Persist Generic Logs]
+        Sandbox -- "Error" --> healer{Self-Healing}
+        healer -- "Retry (Max 3)" --> Coder
+        healer -- "Give Up" --> Fail[Error Report]
+    end
+    
+    Result --> UI[Web Dashboard]
+    Fail --> UI
+```
 
-Execution Flow
+---
 
-Intent Classification
-Determines whether the request requires computation, code execution, or plain text.
+## 🔧 Setup & Installation
 
-Code Generation
-The Coder model generates a pure Python script for analysis tasks.
+### Prerequisites
+*   **Docker Engine** running locally (expose daemon if on Windows/WSL).
+*   **JDK 25** installed.
+*   **Ollama** running with the required models:
+    ```bash
+    ollama pull llama3.2
+    ollama pull llama3.1:8b
+    ```
 
-Sanitization Layer
-Removes Markdown, prose, and artifacts from LLM output.
+### Installation
 
-Sandbox Execution
-The script is executed inside a locked-down Docker container.
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/orchestrator.git
+    cd orchestrator
+    ```
 
-Self-Healing
-If an error occurs, the traceback is fed back to the model for correction.
+2.  **Configuration:**
+    Check `src/main/resources/application.yml` and ensure your Ollama base URL is correct (default: `http://localhost:11434`).
 
-Async Persistence
-All logs are stored in H2 using Virtual Threads to avoid blocking the UI.
+3.  **Run the application:**
+    ```bash
+    mvn spring-boot:run
+    ```
 
-🔧 Setup & Installation
-Prerequisites
+4.  **Access the Dashboard:**
+    Open [http://localhost:8080](http://localhost:8080) in your browser.
 
-Docker Engine running locally
+---
 
-Ollama installed with:
+## 🛡️ Security Architecture
 
-llama3.2:3b
+| Feature | Implementation | Purpose |
+| :--- | :--- | :--- |
+| **Network Isolation** | `withNetworkDisabled(true)` | Prevents data exfiltration and external attacks. |
+| **RAM Limit** | `512 MB` | Prevents memory exhaustion DoS. |
+| **CPU Limit** | `50%` | Ensures host system stability. |
+| **Ephemeral State** | `Auto-remove` | No filesystem state survives execution. |
 
-llama3.1:8b
+---
 
-JDK 25
+## 🎯 Why This Matters
 
-Installation
-
-Clone the repository
-
-Configure application.yml with:
-
-Ollama base URL
-
-Model names
-
-Run:
-
-mvn spring-boot:run
-
-
-Open the dashboard:
-
-http://localhost:8080/index.html
-
-🛡️ Security Architecture
-
-This system is designed for safe execution of untrusted AI code.
-
-🔒 Network Isolation
-
-Docker containers are created with:
-
-withNetworkDisabled(true)
-
-
-This prevents:
-
-Data exfiltration
-
-External API calls
-
-Lateral movement
-
-⚙️ Resource Quotas
-
-Hard limits prevent DoS attacks:
-
-Resource	Limit
-RAM	512 MB
-CPU	50%
-Lifetime	Auto-removed
-🧹 Ephemeral Execution
-
-Containers are:
-
-Auto-removed
-
-Force-killed after execution
-
-Never reused
-
-No filesystem state or processes survive after execution.
-
-🎯 Why This Matters
-
-This project demonstrates a production-grade pattern for:
-
-Running LLM-generated code safely
-
-Enabling autonomous reasoning agents
-
-Preventing sandbox escapes
-
-Supporting self-correcting AI workflows
-
-It can be extended to:
-
-Data analysis
-
-AI copilots
-
-Autonomous ETL
-
-Secure AI tooling
-
-Agent-based automation
+This project demonstrates that **Autonomous AI Agents** can be more than just chatbots. By combining **LLM reasoning** with **secure sandboxing**, we can create systems that not only talk but *do*—safely and reliably.

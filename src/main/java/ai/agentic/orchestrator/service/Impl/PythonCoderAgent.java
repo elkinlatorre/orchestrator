@@ -33,8 +33,6 @@ public class PythonCoderAgent implements CodeGeneratorAgent {
         Task: %s
         """.formatted(taskDescription);
 
-        String generatedCode = chatModel.generate(systemInstruction).trim();
-
         String rawCode = chatModel.generate(systemInstruction).trim();
 
         return sanitizeCode(rawCode);
@@ -65,10 +63,6 @@ public class PythonCoderAgent implements CodeGeneratorAgent {
                 .replaceAll("```(.*?)```", "$1")
                 .replace("```", "")
                 .trim();
-
-        // 2. Logic to detect if there's prose after the code
-        // (If the code has a print and then more text, we stop at the last logical line)
-        // For now, the prompt should handle most, but the regex above is the first shield.
 
         log.debug("Sanitized Code for Docker: \n{}", cleanCode);
         return cleanCode;
